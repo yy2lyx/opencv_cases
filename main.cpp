@@ -1,62 +1,54 @@
+//
+//  main.cpp
+//  OpencvCases
+//
+//  Created by å¶ç°2018 on 2020/10/24.
+//  Copyright Â© 2020 yeyan_2018. All rights reserved.
+//
+
 #include <iostream>
-#include "case1.h"
-#include "case2.h"
-#include <opencv2/opencv.hpp>
+#include "case1.hpp"
+#include "case2.hpp"
+#include "case3.hpp"
+#include "case4.hpp"
+#include "case5.hpp"
+#include "case6.hpp"
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
+#include <iostream>
 
-using namespace std;
 using namespace cv;
+using namespace std;
 
-int main() {
-	// case6:ÕÕÆ¬À´×ÔÌ«¿ÕÍûÔ¶¾µµÄĞÇÔÆÍ¼Ïñ£¬Ï£ÍûÖªµÀÃæ»ıºÍÖÜ³¤
-	string img_path = "D:/yeyan/vs_project/case/case6.png";
-	Mat src,gray_src,bin_src;
-	src = imread(img_path);
-	if (src.empty()) {
-		cout << "Could not load img!" << endl;
-		return -1;
-	}
-	imshow("src", src);
 
-	// ¸ßË¹ÂË²¨½µÔë(±£Áô±ßÔµÂÖÀª£¬Ä£ºıÄÚ²¿Ï¸½Ú£¬ÕâÀïÊÇ²»ÏëÒªµÄ)£¬¶øÆäËûµÄÂË²¨Æ÷°ÑÏ¸½Ú¶¼Ä£ºıÁË
-	GaussianBlur(src,src,Size(13,13),0,0);
-	//blur(src,src,Size(13,13));
-	imshow("gaus", src);
+int main(int argc,char** argv){
+    
+//     case1
+    string img1_path = "/Users/yeyan2018/xcode_project/C++_project/CasesImg/case1.png";
+    case1_demo(img1_path);
 
-	
-	cvtColor(src, gray_src, CV_BGR2GRAY);
-	// THRESH_OTSU ´ó½ò·¨¶ÔÖ±·½Í¼ÓĞÁ½¸ö·å£¬ÖĞ¼äÓĞÃ÷ÏÔ²¨¹ÈµÄÖ±·½Í¼¶ÔÓ¦Í¼Ïñ¶şÖµ»¯Ğ§¹û±È½ÏºÃ£¬¶ø¶ÔÓÚÖ»ÓĞÒ»¸öµ¥·åµÄÖ±·½Í¼¶ÔÓ¦µÄÍ¼Ïñ·Ö¸îĞ§¹ûÃ»ÓĞË«·åµÄºÃ¡£
-	// THRESH_TRIANGLE ÔÚµ«ÊÇÓĞÊ±ºòÍ¼ÏñµÄÖ±·½Í¼Ö»ÓĞÒ»¸ö²¨·å,Õâ¸öÊ±ºòÊ¹ÓÃTRIANGLE·½·¨Ñ°ÕÒãĞÖµÊÇ±È½ÏºÃµÄÒ»¸öÑ¡Ôñ¡£
-	// ÕâÀïÃ÷ÏÔµÄÍ¼ÏñÉÏ½öÓĞÒ»¸ö²¨·å£¬xÖá´ÓºÚµ½°×£¬ÖĞ¼äµÄ»Ò¶È²¿·ÖÏñËØµã×î¶à£¬Òò´ËÅĞ¶Ï½öÓĞÒ»¸ö²¨·å
-	threshold(gray_src,bin_src,0,255,THRESH_BINARY | THRESH_TRIANGLE);
-	imshow("bin", bin_src);
+//     case2
+    string img2_path = "/Users/yeyan2018/xcode_project/C++_project/CasesImg/case2.png";
+    Case2DetectLines case2 = Case2DetectLines(img2_path);
+    case2.case2process();
 
-	// ĞÎÌ¬Ñ§±Õ²Ù×÷£º½«×î´óµÄÂÖÀªÄÚµÄÒ»Ğ©Ğ¡¿ÕÏ¶Ìî²¹£¬×¢ÒâÕâÀï²»ÄÜÓÃÅòÕÍ²Ù×÷£¬»á¸Ä±äÂÖÀªµÄ´óĞ¡¡£
-	Mat kernel = getStructuringElement(MORPH_RECT,Size(3,3));
-	morphologyEx(bin_src,bin_src,MORPH_CLOSE,kernel,Point(-1,-1),2);
-	imshow("close", bin_src);
+//     case3
+    string img3_path = "/Users/yeyan2018/xcode_project/C++_project/CasesImg/case3.png";
+    Case3DetectCircle case3 = Case3DetectCircle(img3_path);
+    case3.main_process();
 
-	// »ñÈ¡×î´óµÄÂÖÀª
-	vector<vector<Point>> contours;
-	vector<Vec4i> hireachy;
-
-	findContours(bin_src,contours,hireachy,CV_RETR_EXTERNAL,CHAIN_APPROX_SIMPLE);
-	Mat clone_img = Mat::zeros(src.size(), CV_8UC3);
-	for (size_t t = 0; t < contours.size();t++) {
-		// ×î´óÂÖÀªµÄ¹ıÂË
-		Rect rect = boundingRect(contours[t]);
-		if (rect.width < src.cols * 0.5 && rect.height < src.rows * 0.5 ) continue;
-		if (rect.width > src.cols * 0.9 && rect.width > src.cols * 0.9) continue;
-		drawContours(clone_img,contours,t,Scalar(0,0,255));
-		// Á¬Í¨ÇøÓòµÄÃæ»ıºÍÖÜ³¤
-		double area = contourArea(contours[t]);
-		double lenth = arcLength(contours[t],true);
-
-		cout << "Area: " << area << "Lenth: " << lenth << endl;
-	}
-	imshow("contours", clone_img);
-	
-	waitKey(0);
-	return 0;
+//     case4
+    string img4_path = "/Users/yeyan2018/xcode_project/C++_project/CasesImg/case4.png";
+    Case4ObjectCount case4 = Case4ObjectCount(img4_path);
+    case4.main_process();
+    
+    // case5
+    string img5_path = "/Users/yeyan2018/xcode_project/C++_project/CasesImg/case5.png";
+    PerspectiveTransform case5 = PerspectiveTransform(img5_path);
+    case5.main_process();
+    
+    // case6 : åˆ†æ°´å²­ç®—æ³• â€”â€” æ‰‘å…‹ç‰Œ
+    string img6_path = "/Users/yeyan2018/xcode_project/C++_project/CasesImg/case6.png";
+    distanceWatershed(img6_path);
 }
-
+ 
